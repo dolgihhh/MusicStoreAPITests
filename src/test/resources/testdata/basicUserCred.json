@@ -1,0 +1,5 @@
+{
+  "email": "basic@basic.com",
+  "username": "basic",
+  "password": "basicbasic" //TODO: генерить на лету, этот убрать
+}
