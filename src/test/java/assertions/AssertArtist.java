@@ -3,6 +3,7 @@ package assertions;
 import models.requests.ArtistRequest;
 import models.responses.ArtistResponse;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
@@ -24,6 +25,10 @@ public class AssertArtist {
         assertNotNull(actual, "Исполнитель не обновлен");
         assertNotEquals(expected.getName(), actual.getName(), "Имя исполнителя не обновлено");
         assertNotEquals(expected.getDescription(), actual.getDescription(), "Описание исполнителя не обновлено");
-        assertEquals(actual, actualAfterGet, "Исполнитель после обновления не совпадает с полученным из API");
+        assertEquals(expected.getId(), actual.getId(), "ID исполнителя должен оставаться неизменным при обновлении");
+        assertThat(actual)
+                .as("Исполнитель после обновления не совпадает с полученным из API")
+                .usingRecursiveComparison()
+                .isEqualTo(actualAfterGet);
     }
 }
