@@ -12,6 +12,7 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <aspectj.version>1.9.24</aspectj.version>
     </properties>
 
     <dependencyManagement>
@@ -119,7 +120,7 @@
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjweaver</artifactId>
-            <version>1.9.24</version>
+            <version>${aspectj.version}</version>
         </dependency>
     </dependencies>
 
@@ -132,6 +133,10 @@
                 <version>3.1.2</version>
                 <configuration>
                     <useSystemClassLoader>false</useSystemClassLoader>
+                    <testFailureIgnore>false</testFailureIgnore>
+                    <argLine>
+                        -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"
+                    </argLine>
                 </configuration>
             </plugin>
 
