@@ -1,10 +1,7 @@
 package models.responses;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 
 import java.time.LocalDateTime;
 
@@ -12,15 +9,15 @@ import java.time.LocalDateTime;
 public class UserResponse {
     private String email;
     private String username;
-    private Integer id;
+    private Long id;
 
-    @JsonProperty("is_active")
-    private Boolean isActive;
+    //@JsonProperty("is_active")
+    private Boolean is_active;
 
-    @JsonProperty("is_admin")
-    private Boolean isAdmin;
+    //@JsonProperty("is_admin")
+    private Boolean is_admin;
 
-    @JsonProperty("created_at")
+    //@JsonProperty("created_at")
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS")
-    private LocalDateTime createdAt;
+    private LocalDateTime created_at;
 }

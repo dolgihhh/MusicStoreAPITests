@@ -4,15 +4,13 @@ import config.RequestSpecFactory;
 import endpoints.AuthEndpoints;
 import io.restassured.response.Response;
 import models.requests.UserRequest;
-import models.responses.UserResponse;
-import org.apache.http.HttpStatus;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import static io.restassured.RestAssured.given;
 
-public class AuthApiClientUnchecked {
+public class AuthApiUnchecked {
     public Response registerUser(UserRequest requestBody) {
         return given()
                 .spec(RequestSpecFactory.jsonSpec())

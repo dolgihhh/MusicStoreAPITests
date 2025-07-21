@@ -2,6 +2,7 @@ package tests;
 
 import assertions.AssertAuth;
 import data.UserDataFactory;
+import io.qameta.allure.Epic;
 import io.restassured.response.Response;
 import models.requests.UserRequest;
 import models.responses.UserResponse;
@@ -15,6 +16,7 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@Epic("AUTH")
 @Tag(TestTag.AUTH)
 public class AuthTests extends BaseTest {
     private static final int VALID_USERNAME_LENGTH = 15;
@@ -25,7 +27,7 @@ public class AuthTests extends BaseTest {
     @BeforeAll
     public static void setUp() {
         basicRegisteredUser = UserDataFactory.generateNewValidUser();
-        ApiChecked.auth().registerUserAndExtract(basicRegisteredUser);
+        apiClient.auth().registerUserAndExtract(basicRegisteredUser);
         assertAuth = new AssertAuth();
     }
 
@@ -34,7 +36,7 @@ public class AuthTests extends BaseTest {
     @MethodSource("validUserProvider")
     @ParameterizedTest
     public void shouldRegisterNewUserSuccessfully(UserRequest userRequest) {
-        UserResponse userResponse = ApiChecked.auth().registerUserAndExtract(userRequest);
+        UserResponse userResponse = apiClient.auth().registerUserAndExtract(userRequest);
 
         assertAuth.userRequestEqualsResponse(userRequest, userResponse); //TODO сделать интерфейс ассерт
     }
@@ -44,7 +46,7 @@ public class AuthTests extends BaseTest {
     @MethodSource("invalidUserProvider")
     @ParameterizedTest
     public void shouldNotRegisterUserWithInvalidCredentials(UserRequest request) {
-        Response response = ApiUnchecked.auth().registerUser(request);
+        Response response = apiClient.auth().registerUser(request);
 
         assertEquals(HttpStatus.SC_UNPROCESSABLE_ENTITY, response.getStatusCode());
     }
@@ -56,7 +58,7 @@ public class AuthTests extends BaseTest {
     public void shouldNotRegisterUserWithExistingCredentials() {
         UserRequest request = basicRegisteredUser;
 
-        Response response = ApiUnchecked.auth().registerUser(request);
+        Response response = apiClient.auth().registerUser(request);
 
         assertEquals(HttpStatus.SC_BAD_REQUEST, response.getStatusCode());
     }
@@ -67,7 +69,7 @@ public class AuthTests extends BaseTest {
     @Test
     public void shouldLoginUserSuccessfully() {
         UserRequest request = basicRegisteredUser;
-        String token = ApiChecked.auth().loginAndGetToken(request);
+        String token = apiClient.auth().loginAndExtractToken(request);
 
         assertNotNull(token, "Токен не получен при авторизации пользователя");
     }
@@ -78,7 +80,7 @@ public class AuthTests extends BaseTest {
     public void shouldNotLoginUnregisteredUser() {
         UserRequest request = UserDataFactory.generateNewValidUser();
 
-        Response response = ApiUnchecked.auth().loginUser(request);
+        Response response = apiClient.auth().loginUser(request);
 
         assertEquals(HttpStatus.SC_UNAUTHORIZED, response.getStatusCode(),"Ошибка аутентификации");
     }
@@ -90,7 +92,7 @@ public class AuthTests extends BaseTest {
         UserRequest request = basicRegisteredUser.toBuilder().build();
         request.setPassword(FakerProvider.get().internet().password());
 
-        Response response = ApiUnchecked.auth().loginUser(request);
+        Response response = apiClient.auth().loginUser(request);
 
         assertEquals(HttpStatus.SC_UNAUTHORIZED, response.getStatusCode(),"Ошибка аутентификации");
     }
@@ -101,9 +103,9 @@ public class AuthTests extends BaseTest {
     public void shouldUpdateUserRights() {
         String usernameToUpdate = basicRegisteredUser.getUsername();
 
-        UserResponse updatedUser = ApiChecked.auth().updateUserRightsAndExtract(usernameToUpdate, adminToken, true);
+        UserResponse updatedUser = apiClient.auth().updateUserRightsAndExtract(usernameToUpdate, adminToken, true);
 
-        assertTrue(updatedUser.getIsAdmin(), "Права пользователя не обновлены на admin");
+        assertTrue(updatedUser.getIs_admin(), "Права пользователя не обновлены на admin");
     }
 
     @DisplayName("Обновление прав пользователя обычным зарегистрированным пользователем")
@@ -111,10 +113,10 @@ public class AuthTests extends BaseTest {
     @Tags({@Tag(TestTag.NEGATIVE)})
     public void shouldNotUpdateUserRights() {
         UserRequest newUser = UserDataFactory.generateNewValidUser();
-        ApiChecked.auth().registerUserAndExtract(newUser);
-        String token = ApiChecked.auth().loginAndGetToken(newUser);
+        apiClient.auth().registerUserAndExtract(newUser);
+        String token = apiClient.auth().loginAndExtractToken(newUser);
 
-        Response response = ApiUnchecked.auth().updateUserRights(basicRegisteredUser.getUsername(), token, true);
+        Response response = apiClient.auth().updateUserRights(basicRegisteredUser.getUsername(), token, true);
 
         assertEquals(HttpStatus.SC_FORBIDDEN, response.getStatusCode(), "Обычный пользователь не должен" +
                 " иметь права обновлять права других пользователей");
@@ -124,7 +126,7 @@ public class AuthTests extends BaseTest {
     @Test
     @Tags({@Tag(TestTag.NEGATIVE)})
     public void shouldNotUpdateUserRightsWithoutToken() {
-        Response response = ApiUnchecked.auth().updateUserRights(basicRegisteredUser.getUsername(), "",
+        Response response = apiClient.auth().updateUserRights(basicRegisteredUser.getUsername(), "",
                 true);
 
         assertEquals(HttpStatus.SC_UNAUTHORIZED, response.getStatusCode(), "Доступ без токена не должен " +

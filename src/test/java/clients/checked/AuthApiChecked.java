@@ -1,13 +1,13 @@
 package clients.checked;
 
-import clients.unchecked.AuthApiClientUnchecked;
+import clients.unchecked.AuthApiUnchecked;
 import models.requests.UserRequest;
 import models.responses.UserResponse;
 import org.apache.http.HttpStatus;
 
 import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
 
-public class AuthApiClientChecked extends AuthApiClientUnchecked {
+public class AuthApiChecked extends AuthApiUnchecked {
     public UserResponse registerUserAndExtract(UserRequest requestBody) {
         return registerUser(requestBody)
                 .then()
@@ -17,7 +17,7 @@ public class AuthApiClientChecked extends AuthApiClientUnchecked {
                 .as(UserResponse.class);
     }
 
-    public String loginAndGetToken(UserRequest request) {
+    public String loginAndExtractToken(UserRequest request) {
         return loginUser(request).then()
                 .statusCode(HttpStatus.SC_OK)
                 .extract()
